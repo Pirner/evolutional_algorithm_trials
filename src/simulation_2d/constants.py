@@ -1,0 +1,2 @@
+GRAVITY = -0.3
+HOR_SLOWDOWN = -0.02
