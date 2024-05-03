@@ -12,8 +12,14 @@ class GameSimulation2D:
         """
         self.exit = False
         self.height = 512
-        self.width = 1024
+        self.width = 1536
         self.canvas = pygame.display.set_mode((self.width, self.height))
+        self.strength = 30
+
+        pygame.font.init()
+        my_font = pygame.font.SysFont('Arial', self.strength)
+        self.strength_value = 30
+        self.strength_text = my_font.render('{0}'.format(self.strength_value), False, (0, 0, 0))
 
     def start_mainloop(self):
         """
@@ -22,15 +28,17 @@ class GameSimulation2D:
         """
         self.exit = False
         all_sprites_list = pygame.sprite.Group()
-        player_car = Car((255, 0, 0), 20, 30)
-        player_car.rect.x = 0
-        player_car.rect.y = 0
-        all_sprites_list.add(player_car)
 
-        bullet = Projectile(velocity_x=10, velocity_y=-10, border_x=self.width, border_y=self.height)
-        bullet.rect.x = 0
-        bullet.rect.y = self.height - bullet.height * 2
-        all_sprites_list.add(bullet)
+        arrow = Projectile(
+            velocity_x=15,
+            velocity_y=-20,
+            border_x=self.width,
+            border_y=self.height,
+            im_filepath='assets/arrow.png'
+        )
+        arrow.rect.x = 0
+        arrow.rect.y = self.height - arrow.height * 2
+        all_sprites_list.add(arrow)
 
         clock = pygame.time.Clock()
 
@@ -50,17 +58,13 @@ class GameSimulation2D:
 
             # Game Logic
             all_sprites_list.update()
-
             self.canvas.fill(GREEN)
-            # Draw The Road
-            pygame.draw.rect(self.canvas, GREY, [40, 0, 200, 300])
-            # Draw Line painting on the road
-            pygame.draw.line(self.canvas, WHITE, [140, 0], [140, 300], 5)
 
             # Now let's draw all the sprites in one go. (For now we only have 1 sprite!)
             all_sprites_list.draw(self.canvas)
+            self.canvas.blit(self.strength_text, (0, 0))
 
             # pygame.display.update()
             pygame.display.flip()
-            clock.tick(10)
+            clock.tick(40)
         pygame.quit()
