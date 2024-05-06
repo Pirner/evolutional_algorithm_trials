@@ -1,7 +1,8 @@
 import pygame
 
-from src.simulation_2d.sprites.car import Car
+from src.simulation_2d.mathematics import Arrow2DMathematics
 from src.simulation_2d.sprites.projectile import Projectile
+from src.simulation_2d.sprites.target import Target
 from src.colors import *
 
 
@@ -15,11 +16,22 @@ class GameSimulation2D:
         self.width = 1536
         self.canvas = pygame.display.set_mode((self.width, self.height))
         self.strength = 30
+        self.up_strength_cap = 50
+        self.lo_strength_cap = 10
+
+        self.shoot_angle = 0
+        self.up_angle = 90
+        self.lo_angle = 0
 
         pygame.font.init()
-        my_font = pygame.font.SysFont('Arial', self.strength)
-        self.strength_value = 30
-        self.strength_text = my_font.render('{0}'.format(self.strength_value), False, (0, 0, 0))
+        self.my_font = pygame.font.SysFont('Arial', self.strength)
+        self.strength_text = self.my_font.render('{0}'.format(self.strength), False, (0, 0, 0))
+        self.shoot_angle_text = self.my_font.render('{0}'.format(self.shoot_angle), False, (0, 0, 0))
+
+    def update_values(self):
+        self.my_font = pygame.font.SysFont('Arial', 30)
+        self.strength_text = self.my_font.render('{0}'.format(self.strength), False, (0, 0, 0))
+        self.shoot_angle_text = self.my_font.render('{0}'.format(self.shoot_angle), False, (0, 0, 0))
 
     def start_mainloop(self):
         """
@@ -36,13 +48,23 @@ class GameSimulation2D:
             border_y=self.height,
             im_filepath='assets/arrow.png'
         )
+        target = Target(
+            pos_x=1400,
+            pos_y=370,
+            size_x=150,
+            size_y=150,
+            im_filepath='assets/target.png'
+        )
+        arrow.rotation_angle = self.shoot_angle
         arrow.rect.x = 0
         arrow.rect.y = self.height - arrow.height * 2
         all_sprites_list.add(arrow)
+        all_sprites_list.add(target)
 
         clock = pygame.time.Clock()
 
         while not self.exit:
+            self.update_values()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.exit = True
@@ -51,10 +73,28 @@ class GameSimulation2D:
                         self.exit = False
 
             keys = pygame.key.get_pressed()
+
             if keys[pygame.K_LEFT]:
-                player_car.move_left(5)
+                if self.strength > self.lo_strength_cap:
+                    self.strength -= 1
             if keys[pygame.K_RIGHT]:
-                player_car.move_right(5)
+                if self.strength < self.up_strength_cap:
+                    self.strength += 1
+            if keys[pygame.K_SPACE]:
+                # fire arrow
+                arrow.shot = True
+                # set strength values from rotation and shoot angle
+                vel_x, vel_y = Arrow2DMathematics.get_velocity_x_velocity_y(self.strength, self.shoot_angle)
+                arrow.vel_x = vel_x
+                arrow.vel_y = vel_y
+            if keys[pygame.K_UP]:
+                if self.shoot_angle < self.up_angle:
+                    self.shoot_angle += 1
+                    arrow.rotation_angle = self.shoot_angle
+            if keys[pygame.K_DOWN]:
+                if self.shoot_angle > self.lo_angle:
+                    self.shoot_angle -= 1
+                    arrow.rotation_angle = self.shoot_angle
 
             # Game Logic
             all_sprites_list.update()
@@ -63,6 +103,7 @@ class GameSimulation2D:
             # Now let's draw all the sprites in one go. (For now we only have 1 sprite!)
             all_sprites_list.draw(self.canvas)
             self.canvas.blit(self.strength_text, (0, 0))
+            self.canvas.blit(self.shoot_angle_text, (100, 0))
 
             # pygame.display.update()
             pygame.display.flip()

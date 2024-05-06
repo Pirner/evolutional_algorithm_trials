@@ -35,21 +35,28 @@ class Projectile(pygame.sprite.Sprite):
 
         self.vel_x = velocity_x
         self.vel_y = velocity_y
+        self.rotation_angle = 90
 
         self.img = pygame.image.load(im_filepath)
         self.img = pygame.transform.scale(self.img, (40, 20))
         # pygame.draw.rect(self.image, color, [0, 0, self.width, self.height])
         self.rect = self.image.get_rect()
         self.image = self.img
+        self.rect = self.image.get_rect()
+        self.shot = False
 
     def update(self):
         """
         update the projectile
         :return:
         """
-        y_con = self.rect.y >= self.border_y
+        if not self.shot:
+            self.image = pygame.transform.rotate(self.img, self.rotation_angle)
+            return
+
+        y_con = self.rect.y - 50 >= self.border_y
         x_con = self.rect.x >= self.border_x
-        if (self.rect.y >= self.border_y - self.height) or (self.rect.x >= self.border_x - self.width):
+        if (self.rect.y >= self.border_y - self.height - 10) or (self.rect.x >= self.border_x - 2 * self.width):
             print('finished')
             self.vel_x = 0
             self.vel_y = 0
