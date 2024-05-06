@@ -44,22 +44,27 @@ class Projectile(pygame.sprite.Sprite):
         self.image = self.img
         self.rect = self.image.get_rect()
         self.shot = False
+        self.finished = False
 
     def update(self):
         """
         update the projectile
         :return:
         """
+        if self.finished:
+            return
+
         if not self.shot:
             self.image = pygame.transform.rotate(self.img, self.rotation_angle)
             return
 
         y_con = self.rect.y - 50 >= self.border_y
         x_con = self.rect.x >= self.border_x
-        if (self.rect.y >= self.border_y - self.height - 10) or (self.rect.x >= self.border_x - 2 * self.width):
+        if (self.rect.y >= self.border_y - self.height - 10) or (self.rect.x >= self.border_x - int(2 * self.width)):
             print('finished')
             self.vel_x = 0
             self.vel_y = 0
+            self.finished = True
             return
 
         self.rect.x += self.vel_x
