@@ -36,3 +36,18 @@ class Target(pygame.sprite.Sprite):
         self.rect.x = self.pos_x
         self.rect.y = self.pox_y
         self.image = self.img
+        self.ellipse = None
+        self.create_ellipse()
+
+    def create_ellipse(self):
+        red = (180, 50, 50)
+        self.ellipse = (
+            self.pos_x + 85,
+            self.pox_y + 80,
+            60,
+            70,
+        )
+
+        # drawing an ellipse onto the
+        # ellipse = pygame.draw.ellipse(self.canvas, red, size_ellipse)
+        # maybe make it optional to draw an ellipse

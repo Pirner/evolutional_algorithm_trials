@@ -11,6 +11,7 @@ class GameSimulation2D:
         """
         game simulation for a 2D environment
         """
+        self.arrows = []
         self.exit = False
         self.height = 512
         self.width = 1536
@@ -33,6 +34,21 @@ class GameSimulation2D:
         self.strength_text = self.my_font.render('{0}'.format(self.strength), False, (0, 0, 0))
         self.shoot_angle_text = self.my_font.render('{0}'.format(self.shoot_angle), False, (0, 0, 0))
 
+    def reset_arrows(self):
+        """
+        reset arrows in there
+        :return:
+        """
+        for arrow in self.arrows:
+            if arrow.rotation_angle:
+                arrow.reset_arrow()
+            if arrow.finished and False:
+                arrow.rotation_angle = self.shoot_angle
+                arrow.rect.x = 0
+                arrow.rect.y = self.height - arrow.height * 2
+                arrow.finished = False
+                arrow.shot = False
+
     def start_mainloop(self):
         """
         start the mainloop of the game
@@ -41,25 +57,28 @@ class GameSimulation2D:
         self.exit = False
         all_sprites_list = pygame.sprite.Group()
 
+        target = Target(
+            pos_x=1300,
+            pos_y=330,
+            size_x=225,
+            size_y=225,
+            im_filepath='assets/target.png'
+        )
+
         arrow = Projectile(
             velocity_x=15,
             velocity_y=-20,
             border_x=self.width,
             border_y=self.height,
-            im_filepath='assets/arrow.png'
+            im_filepath='assets/arrow.png',
+            target=target,
         )
-        target = Target(
-            pos_x=1400,
-            pos_y=370,
-            size_x=150,
-            size_y=150,
-            im_filepath='assets/target.png'
-        )
+        self.arrows.append(arrow)
         arrow.rotation_angle = self.shoot_angle
-        arrow.rect.x = 0
-        arrow.rect.y = self.height - arrow.height * 2
-        all_sprites_list.add(arrow)
+        # arrow.rect.x = 0
+        # arrow.rect.y = self.height - arrow.height * 2
         all_sprites_list.add(target)
+        all_sprites_list.add(arrow)
 
         clock = pygame.time.Clock()
 
@@ -81,12 +100,13 @@ class GameSimulation2D:
                 if self.strength < self.up_strength_cap:
                     self.strength += 1
             if keys[pygame.K_SPACE]:
-                # fire arrow
-                arrow.shot = True
-                # set strength values from rotation and shoot angle
-                vel_x, vel_y = Arrow2DMathematics.get_velocity_x_velocity_y(self.strength, self.shoot_angle)
-                arrow.vel_x = vel_x
-                arrow.vel_y = vel_y
+                if not arrow.shot:
+                    # fire arrow
+                    arrow.shot = True
+                    # set strength values from rotation and shoot angle
+                    vel_x, vel_y = Arrow2DMathematics.get_velocity_x_velocity_y(self.strength, self.shoot_angle)
+                    arrow.vel_x = vel_x
+                    arrow.vel_y = vel_y
             if keys[pygame.K_UP]:
                 if self.shoot_angle < self.up_angle:
                     self.shoot_angle += 1
@@ -104,6 +124,15 @@ class GameSimulation2D:
             all_sprites_list.draw(self.canvas)
             self.canvas.blit(self.strength_text, (0, 0))
             self.canvas.blit(self.shoot_angle_text, (100, 0))
+
+            # check for finished arrows
+            if keys[pygame.K_r]:
+                self.reset_arrows()
+
+            # DEBUG STATES
+            color = (255, 0, 0)
+            # ellipse = pygame.draw.ellipse(self.canvas, color, target.ellipse)
+            # bounding_rectangle_projectile = pygame.draw.rect(self.canvas, color, arrow.collision_head)
 
             # pygame.display.update()
             pygame.display.flip()
