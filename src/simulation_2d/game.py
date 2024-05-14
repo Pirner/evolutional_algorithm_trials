@@ -29,6 +29,11 @@ class GameSimulation2D:
         self.strength_text = self.my_font.render('{0}'.format(self.strength), False, (0, 0, 0))
         self.shoot_angle_text = self.my_font.render('{0}'.format(self.shoot_angle), False, (0, 0, 0))
 
+        # create background
+        self.back_ground_img = pygame.image.load('assets/background_arrow_gen.jpg')
+        self.back_ground_img = pygame.transform.scale(self.back_ground_img, (self.width, self.height))
+        self.canvas.blit(self.back_ground_img, (0, 0))
+
     def update_values(self):
         self.my_font = pygame.font.SysFont('Arial', 30)
         self.strength_text = self.my_font.render('{0}'.format(self.strength), False, (0, 0, 0))
@@ -118,7 +123,8 @@ class GameSimulation2D:
 
             # Game Logic
             all_sprites_list.update()
-            self.canvas.fill(GREEN)
+            # self.canvas.fill(GREEN)
+            self.canvas.blit(self.back_ground_img, (0, 0))
 
             # Now let's draw all the sprites in one go. (For now we only have 1 sprite!)
             all_sprites_list.draw(self.canvas)
