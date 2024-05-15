@@ -30,9 +30,15 @@ class GameSimulation2D:
         self.shoot_angle_text = self.my_font.render('{0}'.format(self.shoot_angle), False, (0, 0, 0))
 
         # create background
-        self.back_ground_img = pygame.image.load('assets/background_arrow_gen.jpg')
+        self.back_ground_img = pygame.image.load('assets/background.jpg')
         self.back_ground_img = pygame.transform.scale(self.back_ground_img, (self.width, self.height))
         self.canvas.blit(self.back_ground_img, (0, 0))
+
+        # create ballista sprite
+        self.ballista_img = pygame.image.load('assets/ballista.png')
+        self.ballista_img = pygame.transform.scale(self.ballista_img, (64, 64))
+        self.ballista_img = pygame.transform.flip(self.ballista_img, True, False)
+        self.canvas.blit(self.ballista_img, (0, 0))
 
     def update_values(self):
         self.my_font = pygame.font.SysFont('Arial', 30)
@@ -50,7 +56,7 @@ class GameSimulation2D:
             if arrow.finished and False:
                 arrow.rotation_angle = self.shoot_angle
                 arrow.rect.x = 0
-                arrow.rect.y = self.height - arrow.height * 2
+                arrow.rect.y = self.height - 55
                 arrow.finished = False
                 arrow.shot = False
 
@@ -125,6 +131,7 @@ class GameSimulation2D:
             all_sprites_list.update()
             # self.canvas.fill(GREEN)
             self.canvas.blit(self.back_ground_img, (0, 0))
+            self.canvas.blit(self.ballista_img, (0, self.height - 64))
 
             # Now let's draw all the sprites in one go. (For now we only have 1 sprite!)
             all_sprites_list.draw(self.canvas)

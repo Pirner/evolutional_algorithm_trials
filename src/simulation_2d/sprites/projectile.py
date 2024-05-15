@@ -57,7 +57,8 @@ class Projectile(pygame.sprite.Sprite):
         self.rect.left += 200
         # self.rect.x += 100
         self.rect.x = 0
-        self.rect.y = self.border_y - self.height * 2
+        # self.rect.y = self.border_y - self.height * 2
+        self.rect.y = self.border_y - 55
 
         self.collision_head_x_offset = 40
         self.collision_head = None
@@ -74,7 +75,7 @@ class Projectile(pygame.sprite.Sprite):
         self.vel_x = 0
         self.rotation_angle = 0
         self.rect.x = 0
-        self.rect.y = self.border_y - self.height * 2
+        self.rect.y = self.border_y - 55
         self.create_collision_head()
 
     def create_collision_head(self):
