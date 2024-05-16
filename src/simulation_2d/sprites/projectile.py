@@ -1,4 +1,5 @@
 import pygame
+import math
 import numpy as np
 
 from src.simulation_2d import constants
@@ -63,6 +64,7 @@ class Projectile(pygame.sprite.Sprite):
         self.collision_head_x_offset = 40
         self.collision_head = None
         self.create_collision_head()
+        self.score = 0.0
 
     def reset_arrow(self):
         """
@@ -94,15 +96,40 @@ class Projectile(pygame.sprite.Sprite):
             return True
         return False
 
+    def evaluate_score(self) -> float:
+        """
+        evaluate the score of the shot arrow
+        :return:
+        """
+        assert self.finished
+        # check if is collided with the target
+        if self.check_collision(self.target):
+            self.score = 2.0
+            center_of_target_x = int(self.target.ellipse[0] + 0.5 * self.target.ellipse[2])
+            center_of_target_y = int(self.target.ellipse[1] + 0.5 * self.target.ellipse[3])
+
+            coll_head_x = int(self.collision_head[0] + 0.5 * self.collision_head[2])
+            coll_head_y = int(self.collision_head[1] + 0.5 * self.collision_head[3])
+            distance_x = abs(center_of_target_x - coll_head_x)
+            distance_y = abs(center_of_target_y - coll_head_y)
+            distance = math.sqrt(math.pow(distance_x, 2) + math.pow(distance_y, 2))
+            max_dist = math.sqrt(math.pow(self.target.ellipse[2], 2) + math.pow(self.target.ellipse[3], 2))
+            self.score = 1 - distance / max_dist
+
+        else:
+            self.score = 0.0
+        print(self.score)
+
     def update(self):
         """
         update the projectile
         :return:
         """
-        self.finished = self.check_collision(self.target)
-
         if self.finished:
+            self.score = self.evaluate_score()
             return
+
+        self.finished = self.check_collision(self.target)
 
         if not self.shot:
             self.image = pygame.transform.rotate(self.img, self.rotation_angle)
@@ -111,7 +138,7 @@ class Projectile(pygame.sprite.Sprite):
         y_con = self.rect.y - 50 >= self.border_y
         x_con = self.rect.x >= self.border_x
         if (self.rect.y >= self.border_y - self.height - 10) or (self.rect.x >= self.border_x - int(2 * self.width)):
-            print('finished')
+            # print('finished')
             self.vel_x = 0
             self.vel_y = 0
             self.finished = True
