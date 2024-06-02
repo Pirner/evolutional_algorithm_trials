@@ -26,6 +26,8 @@ class GameSimulation2D:
 
         self.target = None
         self.all_sprites_list = None
+        self.best_arrow = None
+        self.best_score = 0.0
 
         pygame.font.init()
         self.my_font = pygame.font.SysFont('Arial', self.strength)
@@ -78,10 +80,13 @@ class GameSimulation2D:
         takes all the arrows and creates the next generation
         :return:
         """
+        for arrow in self.arrows:
+            arrow.evaluate_score()
         self.arrows.sort(key=lambda x: x.score, reverse=True)
         scores = [x.score for x in self.arrows]
         print(scores)
         n_arrows = len(scores)
+        current_best_gen_arrow = self.arrows[0]
         new_gen_arrows = []
         for arrow in self.arrows:
             self.all_sprites_list.remove(arrow)
@@ -138,6 +143,26 @@ class GameSimulation2D:
         self.arrows = new_gen_arrows
         for arrow in self.arrows:
             self.all_sprites_list.add(arrow)
+        # handle the current best gen arrow
+        tmp_arrow = arrow = Projectile(
+                velocity_x=15,
+                velocity_y=-20,
+                border_x=self.width,
+                border_y=self.height,
+                im_filepath='assets/arrow.png',
+                target=self.target,
+                up_streng_limit=self.up_strength_cap,
+                lo_strength_limit=self.lo_strength_cap,
+                up_angle_imit=self.up_angle,
+                lo_angle_limit=self.lo_angle,
+                # male=self.arrows[0],
+                # female=self.arrows[1],
+            )
+        tmp_arrow.inputWeights = current_best_gen_arrow.inputWeights.copy()
+        tmp_arrow.hiddenWeights = current_best_gen_arrow.hiddenWeights.copy()
+
+        self.arrows.append(tmp_arrow)
+        self.all_sprites_list.add(tmp_arrow)
 
     def start_mainloop(self):
         """

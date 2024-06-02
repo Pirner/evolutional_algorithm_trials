@@ -82,8 +82,8 @@ class Projectile(pygame.sprite.Sprite):
             self.inputWeights = np.random.normal(0, scale=0.1, size=(2, 3))
             self.hiddenWeights = np.random.normal(0, scale=0.1, size=(3, 2))
         elif female is None:  # Only one Parent (self mutate)
-            self.inputWeights = male.inputWeights
-            self.hiddenWeights = male.hiddenWeights
+            self.inputWeights = male.inputWeights.copy()
+            self.hiddenWeights = male.hiddenWeights.copy()
             self.mutate()
         else:  # Two parents - Breed.
             self.inputWeights = np.random.normal(0, scale=0.1, size=(2, 3))
@@ -148,6 +148,7 @@ class Projectile(pygame.sprite.Sprite):
             self.score += 200
 
         print(self.score)
+        score = self.score
         return self.score
 
     @staticmethod
@@ -204,11 +205,11 @@ class Projectile(pygame.sprite.Sprite):
         update the projectile
         :return:
         """
-        if self.finished:
-            self.score = self.evaluate_score()
-            return
-
         self.finished = self.check_collision(self.target)
+
+        if self.finished:
+            # self.score = self.evaluate_score()
+            return
 
         if not self.shot:
             self.image = pygame.transform.rotate(self.img, self.rotation_angle)
