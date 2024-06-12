@@ -1,3 +1,5 @@
+import random
+
 import pygame
 
 from src.simulation_2d.mathematics import Arrow2DMathematics
@@ -19,6 +21,10 @@ class GameSimulation2D:
         self.strength = 30
         self.up_strength_cap = 45
         self.lo_strength_cap = 5
+
+        self.target_max_x = 1300
+        self.target_min_x = 800
+        self.target_max_y = 330
 
         self.shoot_angle = 0
         self.up_angle = 90
@@ -164,6 +170,22 @@ class GameSimulation2D:
         self.arrows.append(tmp_arrow)
         self.all_sprites_list.add(tmp_arrow)
 
+    def create_target(self):
+        """
+        create new target
+        :return:
+        """
+        self.all_sprites_list.remove(self.target)
+        target_x = random.randint(self.target_min_x, self.target_max_x)
+        self.target = Target(
+            pos_x=target_x,
+            pos_y=self.target_max_y,
+            size_x=225,
+            size_y=225,
+            im_filepath='assets/target.png'
+        )
+        self.all_sprites_list.add(self.target)
+
     def start_mainloop(self):
         """
         start the mainloop of the game
@@ -171,13 +193,14 @@ class GameSimulation2D:
         """
         use_ai = True
         n_arrows = 50
+        n_rounds = 200
 
         self.exit = False
         self.all_sprites_list = pygame.sprite.Group()
 
         target = Target(
-            pos_x=1300,
-            pos_y=330,
+            pos_x=self.target_max_x,
+            pos_y=self.target_max_y,
             size_x=225,
             size_y=225,
             im_filepath='assets/target.png'
@@ -219,6 +242,8 @@ class GameSimulation2D:
                         arrow.vel_y = vel_y
                 if self.all_arrows_finished():
                     print('finished all arrows')
+                    # move target
+                    self.create_target()
                     self.generate_new_gen_of_arrows()
 
             else:
